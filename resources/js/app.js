@@ -6,23 +6,24 @@ window.Vue = require('vue');
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('table-component', require('./components/TableComponent.vue').default);
 Vue.component('agregar-cliente-component', require('./components/AgregarClienteComponent.vue').default);
+Vue.component('editar-cliente-component', require('./components/EditarClienteComponent.vue').default);
+Vue.component('cambiar-imagen-component', require('./components/CambiarImagenComponent.vue').default);
 
 const app = new Vue({
 
     el: '#app',
     data() {
         return {
-            info: 'probando vue en laravel var info je',
-            helados: [],
-            path: 'api/'
+            elementVisible: true,
+            datosCliente: []
         }
     },
 
-    mounted() {
-        //console.log('componente montado junto con var data info '+this.info+' mas NAV= '+this.mostrarNav)        
+   created() {
+       setTimeout(() => this.elementVisible = false, 3000)
     },
 
     methods: {
-        
+
     }
 });

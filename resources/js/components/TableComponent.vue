@@ -14,51 +14,72 @@
         </thead>
         <tbody>
             <tr></tr>
-            <tr>
-                <td>2</td>
-                <td>Miguel</td>
-                <td>miguel@correo.com</td>
-                <td>categoria</td>
-                <td>30ujuuuu</td>
-                <td>
-                    <a href="">Editar</a>
-                    |
-                    <a href="">Borrar</a>
+            <tr v-for="cliente in clientes" :key="cliente.cliente_id">
+                <td >
+                    {{ cliente.cliente_id }}
                 </td>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>name</td>
-                <td>name@correo.com</td>
-                <td>categoria</td>
-                <td>40</td>
-                <td>
-                    <a href="#" data-toggle="modal" data-target="#ModalEditarCliente">Editar</a>
-                    |
-                    <a href="#">Borrar</a>
+                <td >
+                    {{ cliente.nombre_cliente }}
                 </td>
-            </tr>
-            <tr>
-                <td v-for="cliente in clientes" :key="cliente.id">
-                    {{ cliente.nombre }}                
+                <td >
+                    {{ cliente.email }}
+                </td>
+                <td >
+                    {{ cliente.categoria }}
+                </td>
+                <td >
+                    {{ cliente.edad }}
+                </td>
+                <td>
+                    <editar-cliente-component v-bind:datosClientes="cliente"></editar-cliente-component>
+                    <a href="'#'" data-toggle="modal" :data-target="'#ModalEditarCliente'+cliente.edad">Editar</a>
+                    |
+                    <a href="#" @click.prevent="borrarCliente">Borrar</a>
                 </td>
             </tr>
         </tbody>
     </table>
 </div>
-    </div> 
+    </div>
 </template>
 
 <script>
 export default {
     data() {
         return {
-            clientes: []
+            clientes: [],
+            id: ''
         }
     },
+
+    props: [
+        'datosClientes'
+    ],
+
     created() {
-        axios.get('api/cliente')
-        .then(response => this.clientes = response.data);
+        console.log('componente table creado')
+        console.log(this.listarClientes())
+    },
+    methods: {
+        listarClientes() {
+            axios.get('./api/cliente')
+                .then(response => this.clientes = response.data)
+                .catch(error => {
+                    console.log(error.message + ' get: api/cliente');
+                })
+                .finally(
+                    console.log(this.clientes)
+                );
+        },
+        borrarCliente() {
+            alert(' para actualizar ');
+            axios.post('./api/cliente/id')
+                .then(console.log('ES MI ID: '))
+                .catch(function (error) {
+                    console.log(error + ' PUT: ACTUALIZAR CLIENTE')
+                });
+
+        }
     }
 }
 </script>

@@ -18,7 +18,7 @@
 </head>
 <body>
     <div id="app">
-        {{--     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+            {{--<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
                 <div class="container">
                     <a class="navbar-brand" href="{{ url('/') }}">
                         {{ config('app.name', 'Laravel') }}
@@ -67,15 +67,23 @@
                         </ul>
                     </div>
                 </div>
-            </nav> --}}
-    
+            </nav>--}}
         <main>
             @yield('content')
         </main>
-        
+
     </div>
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>    
+
+    <script src="{{ asset('js/app.js') }}"></script>
+
+    <script>
+        $(".custom-file-input").on("change", function() {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+
 </body>
 
 </html>

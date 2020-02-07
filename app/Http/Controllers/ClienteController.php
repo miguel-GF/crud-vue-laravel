@@ -2,29 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Repos\ClienteRepos;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use PHPUnit\Exception;
 
 class ClienteController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function index()
     {
-        return Cliente::all();
+       // return Cliente::all();
+        try {
+            $clientes = ClienteRepos::listarClientes();
+            $array = collect($clientes)->toArray();
+            return $array;
+        }
+        catch (Exception $error) {
+            $error -> getMessage();
+            return $error;
+        }
+
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -34,7 +36,15 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            ClienteRepos::guardarCliente($request);
+            return redirect('/home')->with('status', 'Información del Cliente Guardada Correctamente.');
+        }
+        catch (Exception $error) {
+            $error -> getMessage();
+            return $error;
+        }
+
     }
 
     /**
