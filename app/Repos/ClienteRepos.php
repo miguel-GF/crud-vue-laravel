@@ -12,11 +12,11 @@ class ClienteRepos
      * DE CLIENTES con estatus ACTIVO
      * @return Exception|\Exception
      */
+
     public static function listarClientes()
     {
         try{
             $query = DB::table('cat_clientes')
-                    ->select('*')
                     ->where('cat_clientes.status', '=', 200)
                     ->join('cat_clientes_categorias', 'cat_clientes.cliente_categoria_id', '=', 'cat_clientes_categorias.cliente_categoria_id')
                     ->join('users','cat_clientes.registro_autor_id', '=', 'users.id')
@@ -24,7 +24,7 @@ class ClienteRepos
                         'cat_clientes.nombre as nombre_cliente',
                                 'cat_clientes.edad',
                                 'cat_clientes.email',
-                                'cat_clientes.cliente_id',
+                                'cat_clientes.cliente_id as id',
                                 'cat_clientes.descripcion',
                                 'cat_clientes.cliente_categoria_id as id_categoria',
                                 'cat_clientes_categorias.nombre as categoria'
@@ -42,9 +42,11 @@ class ClienteRepos
     }
 
     /**
+     * RECIBE LOS DATOS NECESARIOS Y GUARDA UN CLIENTE NUEVO
      * @param Request $request
-     * @return \Exception|Request|Exception
+     * @return bool|\Exception|Exception
      */
+
     public static function guardarCliente(Request $request)
     {
         try {
@@ -77,4 +79,46 @@ class ClienteRepos
             return $error;
         }
     }
+
+    /**
+     * RECIBE LOS DATOS NECESARIOS Y EDITA UN CLIENTE EXISTENTE
+     * @param Request $request
+     */
+
+    public static function editaCliente(Request $request)
+    {
+        try {
+            $query = DB::table('cat_clientes')
+                ->where('cliente_id',"=", $request->get('idCliente'))
+                ->update([
+                    'nombre' => $request->get('nombre'),
+                    'edad' => $request->get('edad'),
+                    'email' => $request->get('email'),
+                    'cliente_categoria_id' => $request->get('categoria'),
+                    'descripcion' => $request->get('descripcion')
+                ]);
+
+             return true;
+        }
+        catch (Exception $error) {
+            $error -> getMessage();
+            return $error;
+        }
+    }
+
+    public static function borraCliente(Request $request) {
+        try {
+            $query = DB::table('cat_clientes')
+                ->where('cliente_id',"=", $request->get('id'))
+                ->update([
+                    'status' => 300
+                ]);
+            return true;
+        }
+        catch (Exception $error) {
+            $error -> getMessage();
+            return $error;
+        }
+    }
+
 }

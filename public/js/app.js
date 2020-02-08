@@ -1983,7 +1983,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2005,15 +2004,16 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       //return this.categorias;
-      axios.get('./api/categoria').then(function (response) {
+      axios.get('./api/listarCategorias').then(function (response) {
         return _this.categorias = response.data;
       })["catch"](function (error) {
         console.log(error.message + ' get: api/categoria');
       })["finally"](console.log(this.categorias));
     },
     agregarCliente: function agregarCliente() {
-      axios.post('./api/cliente', {
-        nombre: this.name,
+      if (!this.checkFormAgregarCl()) return false;
+      axios.post('./api/agregarCliente', {
+        nombre: this.nombre,
         edad: this.edad,
         email: this.email,
         categoria: this.categoria,
@@ -2022,10 +2022,7 @@ __webpack_require__.r(__webpack_exports__);
         console.log(error);
       });
     },
-    checkFormAgregarCl: function checkFormAgregarCl(e) {
-      /*if (this.nombre && this.edad && this.email && this.categoria){
-          return true;
-      }*/
+    checkFormAgregarCl: function checkFormAgregarCl() {
       this.errors = [];
 
       if (!this.nombre) {
@@ -2049,8 +2046,6 @@ __webpack_require__.r(__webpack_exports__);
       if (!this.errors.length) {
         return true;
       }
-
-      e.preventDefault();
     },
     validEmail: function validEmail(email) {
       var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -2206,25 +2201,74 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      categorias: []
+      categorias: [],
+      errors: [],
+      edad: '',
+      email: '',
+      categoria: '',
+      descripcion: '',
+      nombre: '',
+      idCliente: ''
     };
   },
   props: ['datosClientes'],
+  created: function created() {
+    console.log('componente creado edicion cliente');
+    console.log(this.listarCategorias());
+  },
   methods: {
     listarCategorias: function listarCategorias() {
       var _this = this;
 
       //return this.categorias;
-      axios.get('./api/categoria').then(function (response) {
+      axios.get('./api/listarCategorias').then(function (response) {
         return _this.categorias = response.data;
       })["catch"](function (error) {
-        console.log(error.message + ' editar-get: api/categoria');
+        console.log(error.message + ' componenteeditar-get: api/categoria');
       })["finally"](console.log(this.categorias));
+    },
+    editarCliente: function editarCliente() {
+      if (!this.checkFormEditarCl()) return false;
+      axios.post('./api/editarCliente', {
+        nombre: this.datosClientes.nombre_cliente,
+        edad: this.datosClientes.edad,
+        email: this.datosClientes.email,
+        categoria: this.datosClientes.id_categoria,
+        descripcion: this.datosClientes.descripcion,
+        idCliente: this.datosClientes.id
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    checkFormEditarCl: function checkFormEditarCl() {
+      this.errors = [];
+
+      if (!this.nombre) {
+        this.errors.push('El Nombre es obligatorio.');
+      }
+
+      if (!this.edad) {
+        this.errors.push('La Edad es obligatoria.');
+      }
+
+      if (!this.email) {
+        this.errors.push('El Correo Electrónico es obligatorio.');
+      } else if (!this.validEmail(this.email)) {
+        this.errors.push('El Correo Electrónico debe ser válido.');
+      }
+
+      if (!this.categoria) {
+        this.errors.push('La Categoria es obligatorio.');
+      }
+
+      if (!this.errors.length) {
+        return true;
+      }
+    },
+    validEmail: function validEmail(email) {
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
     }
-  },
-  created: function created() {
-    console.log('componente creado edicion cliente');
-    console.log(this.listarCategorias());
   }
 });
 
@@ -2317,11 +2361,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      clientes: [],
-      id: ''
+      clientes: []
     };
   },
   props: ['datosClientes'],
@@ -2333,16 +2377,17 @@ __webpack_require__.r(__webpack_exports__);
     listarClientes: function listarClientes() {
       var _this = this;
 
-      axios.get('./api/cliente').then(function (response) {
+      axios.get('./api/listarClientes').then(function (response) {
         return _this.clientes = response.data;
       })["catch"](function (error) {
         console.log(error.message + ' get: api/cliente');
       })["finally"](console.log(this.clientes));
     },
-    borrarCliente: function borrarCliente() {
-      alert(' para actualizar ');
-      axios.post('./api/cliente/id').then(console.log('ES MI ID: '))["catch"](function (error) {
-        console.log(error + ' PUT: ACTUALIZAR CLIENTE');
+    borrarCliente: function borrarCliente(id) {
+      axios.post('./api/borrarCliente', {
+        id: id
+      })["catch"](function (error) {
+        console.log(error);
       });
     }
   }
@@ -37724,8 +37769,13 @@ var render = function() {
     _c(
       "form",
       {
-        attrs: { action: "./api/cliente", method: "POST" },
-        on: { click: _vm.checkFormAgregarCl, submit: _vm.agregarCliente }
+        attrs: { method: "POST" },
+        on: {
+          submit: function($event) {
+            $event.preventDefault()
+            return _vm.agregarCliente($event)
+          }
+        }
       },
       [
         _c("div", { staticClass: "container-fluid" }, [
@@ -37822,7 +37872,7 @@ var render = function() {
                               }
                             ],
                             staticClass: "form-control rounded-0",
-                            attrs: { type: "text", name: "edad" },
+                            attrs: { type: "number", name: "edad", min: "0" },
                             domProps: { value: _vm.edad },
                             on: {
                               input: function($event) {
@@ -37884,7 +37934,10 @@ var render = function() {
                                 }
                               ],
                               staticClass: "form-control rounded-0",
-                              attrs: { name: "categoria" },
+                              attrs: {
+                                placeholder: "hello mike",
+                                name: "categoria"
+                              },
                               on: {
                                 change: function($event) {
                                   var $$selectedVal = Array.prototype.filter
@@ -38136,217 +38189,266 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "container-fluid" }, [
-      _c(
-        "div",
-        {
-          staticClass: "modal fade modal-open",
-          attrs: {
-            id: "ModalEditarCliente" + _vm.datosClientes.edad,
-            role: "dialog",
-            "aria-labelledby": "exampleModalCenterTitle",
-            "aria-hidden": "true"
+    _c(
+      "form",
+      {
+        attrs: { method: "POST" },
+        on: {
+          submit: function($event) {
+            $event.preventDefault()
+            return _vm.editarCliente($event)
           }
-        },
-        [
+        }
+      },
+      [
+        _c("div", { staticClass: "container-fluid" }, [
           _c(
             "div",
             {
-              staticClass: "modal-dialog modal-dialog-centered",
-              attrs: { role: "document" }
+              staticClass: "modal fade modal-open",
+              attrs: {
+                id: "ModalEditarCliente" + _vm.datosClientes.id,
+                role: "dialog",
+                "aria-labelledby": "exampleModalCenterTitle",
+                "aria-hidden": "true"
+              }
             },
             [
-              _c("div", { staticClass: "modal-content rounded-0 p-lg-3" }, [
-                _vm._m(0),
-                _vm._v(" "),
-                _c("div", { staticClass: "modal-body" }, [
-                  _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col" }, [
-                      _c("span", [_vm._v("Nombre")]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.datosClientes.nombre_cliente,
-                            expression: "datosClientes.nombre_cliente"
-                          }
-                        ],
-                        staticClass: "form-control rounded-0",
-                        attrs: { name: "nombre", type: "text", required: "" },
-                        domProps: { value: _vm.datosClientes.nombre_cliente },
-                        on: {
-                          input: function($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.datosClientes,
-                              "nombre_cliente",
-                              $event.target.value
-                            )
-                          }
-                        }
-                      })
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("br"),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col-md-6" }, [
-                      _c("span", [_vm._v("Correo electrónico")]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.datosClientes.email,
-                            expression: "datosClientes.email"
-                          }
-                        ],
-                        staticClass: "form-control rounded-0",
-                        attrs: { type: "email", name: "email", required: "" },
-                        domProps: { value: _vm.datosClientes.email },
-                        on: {
-                          input: function($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.datosClientes,
-                              "email",
-                              $event.target.value
-                            )
-                          }
-                        }
-                      })
-                    ]),
+              _c(
+                "div",
+                {
+                  staticClass: "modal-dialog modal-dialog-centered",
+                  attrs: { role: "document" }
+                },
+                [
+                  _c("div", { staticClass: "modal-content rounded-0 p-lg-3" }, [
+                    _vm._m(0),
                     _vm._v(" "),
-                    _c("div", { staticClass: "col-md-6" }, [
-                      _c("span", [_vm._v("Edad")]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.datosClientes.edad,
-                            expression: "datosClientes.edad"
-                          }
-                        ],
-                        staticClass: "form-control rounded-0",
-                        attrs: { type: "text", name: "edad", required: "" },
-                        domProps: { value: _vm.datosClientes.edad },
-                        on: {
-                          input: function($event) {
-                            if ($event.target.composing) {
-                              return
+                    _c("div", { staticClass: "modal-body" }, [
+                      _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col" }, [
+                          _c("span", [_vm._v("Nombre")]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model:nombre",
+                                value: _vm.datosClientes.nombre_cliente,
+                                expression: "datosClientes.nombre_cliente",
+                                arg: "nombre"
+                              }
+                            ],
+                            staticClass: "form-control rounded-0",
+                            attrs: { type: "text", required: "" },
+                            domProps: {
+                              value: _vm.datosClientes.nombre_cliente
+                            },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.datosClientes,
+                                  "nombre_cliente",
+                                  $event.target.value
+                                )
+                              }
                             }
-                            _vm.$set(
-                              _vm.datosClientes,
-                              "edad",
-                              $event.target.value
-                            )
-                          }
-                        }
-                      })
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("br"),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col" }, [
-                      _c("span", [_vm._v("Descripción")]),
+                          })
+                        ])
+                      ]),
                       _vm._v(" "),
-                      _c("textarea", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.datosClientes.descripcion,
-                            expression: "datosClientes.descripcion"
-                          }
-                        ],
-                        staticClass: "form-control rounded-0",
-                        attrs: { type: "text", name: "descripcion" },
-                        domProps: { value: _vm.datosClientes.descripcion },
-                        on: {
-                          input: function($event) {
-                            if ($event.target.composing) {
-                              return
+                      _c("br"),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col-md-6" }, [
+                          _c("span", [_vm._v("Correo electrónico")]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model:email",
+                                value: _vm.datosClientes.email,
+                                expression: "datosClientes.email",
+                                arg: "email"
+                              }
+                            ],
+                            staticClass: "form-control rounded-0",
+                            attrs: { type: "email", required: "" },
+                            domProps: { value: _vm.datosClientes.email },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.datosClientes,
+                                  "email",
+                                  $event.target.value
+                                )
+                              }
                             }
-                            _vm.$set(
-                              _vm.datosClientes,
-                              "descripcion",
-                              $event.target.value
-                            )
-                          }
-                        }
-                      })
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("br"),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col" }, [
-                      _c("label", [_vm._v("Categoría")]),
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-6" }, [
+                          _c("span", [_vm._v("Edad")]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model:edad",
+                                value: _vm.datosClientes.edad,
+                                expression: "datosClientes.edad",
+                                arg: "edad"
+                              }
+                            ],
+                            staticClass: "form-control rounded-0",
+                            attrs: { type: "number", min: "0", required: "" },
+                            domProps: { value: _vm.datosClientes.edad },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.datosClientes,
+                                  "edad",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          })
+                        ])
+                      ]),
                       _vm._v(" "),
-                      _c(
-                        "select",
-                        { staticClass: "form-control rounded-0" },
-                        [
-                          _c("option", { attrs: { disabled: "" } }, [
-                            _vm._v("Selecciona una categoría")
-                          ]),
+                      _c("br"),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col" }, [
+                          _c("span", [_vm._v("Descripción")]),
+                          _vm._v(" "),
+                          _c("textarea", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model:descripcion",
+                                value: _vm.datosClientes.descripcion,
+                                expression: "datosClientes.descripcion",
+                                arg: "descripcion"
+                              }
+                            ],
+                            staticClass: "form-control rounded-0",
+                            attrs: { type: "text" },
+                            domProps: { value: _vm.datosClientes.descripcion },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.datosClientes,
+                                  "descripcion",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              { name: "show", rawName: "v-show" },
+                              {
+                                name: "model",
+                                rawName: "v-model:idCliente",
+                                value: _vm.datosClientes.id,
+                                expression: "datosClientes.id",
+                                arg: "idCliente"
+                              }
+                            ],
+                            attrs: { type: "text" },
+                            domProps: { value: _vm.datosClientes.id },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.datosClientes,
+                                  "id",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("br"),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col" }, [
+                          _c("label", [_vm._v("Categoría")]),
                           _vm._v(" "),
                           _c(
-                            "option",
-                            {
-                              attrs: { selected: "" },
-                              domProps: {
-                                value: _vm.datosClientes.id_categoria
-                              }
-                            },
-                            [_vm._v(_vm._s(_vm.datosClientes.categoria))]
-                          ),
-                          _vm._v(" "),
-                          _vm._l(_vm.categorias, function(c) {
-                            return _vm.datosClientes.id_categoria !=
-                              c.cliente_categoria_id
-                              ? _c(
-                                  "option",
-                                  {
-                                    domProps: { value: c.cliente_categoria_id }
-                                  },
-                                  [
-                                    _vm._v(
-                                      "\n\n                                         " +
-                                        _vm._s(c.nombre) +
-                                        "\n\n                                    "
+                            "select",
+                            { staticClass: "form-control rounded-0" },
+                            [
+                              _c("option", { attrs: { disabled: "" } }, [
+                                _vm._v("Selecciona una categoría")
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "option",
+                                {
+                                  attrs: { selected: "" },
+                                  domProps: {
+                                    value: _vm.datosClientes.id_categoria
+                                  }
+                                },
+                                [_vm._v(_vm._s(_vm.datosClientes.categoria))]
+                              ),
+                              _vm._v(" "),
+                              _vm._l(_vm.categorias, function(c) {
+                                return _vm.datosClientes.id_categoria !=
+                                  c.cliente_categoria_id
+                                  ? _c(
+                                      "option",
+                                      {
+                                        domProps: {
+                                          value: c.cliente_categoria_id
+                                        }
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n\n                                         " +
+                                            _vm._s(c.nombre) +
+                                            "\n\n                                    "
+                                        )
+                                      ]
                                     )
-                                  ]
-                                )
-                              : _vm._e()
-                          })
-                        ],
-                        2
-                      )
-                    ])
+                                  : _vm._e()
+                              })
+                            ],
+                            2
+                          )
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _vm._m(1)
                   ])
-                ]),
-                _vm._v(" "),
-                _vm._m(1)
-              ])
+                ]
+              )
             ]
           )
-        ]
-      )
-    ])
+        ])
+      ]
+    )
   ])
 }
 var staticRenderFns = [
@@ -38380,14 +38482,9 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "modal-footer border-0" }, [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-secondary btn btn-success",
-          attrs: { type: "button" }
-        },
-        [_vm._v("Guardar")]
-      )
+      _c("button", { staticClass: "btn btn-secondary btn btn-success" }, [
+        _vm._v("Guardar")
+      ])
     ])
   }
 ]
@@ -38470,11 +38567,11 @@ var render = function() {
             _c("tr"),
             _vm._v(" "),
             _vm._l(_vm.clientes, function(cliente) {
-              return _c("tr", { key: cliente.cliente_id }, [
+              return _c("tr", { key: cliente.id }, [
                 _c("td", [
                   _vm._v(
                     "\n                    " +
-                      _vm._s(cliente.cliente_id) +
+                      _vm._s(cliente.id) +
                       "\n                "
                   )
                 ]),
@@ -38524,7 +38621,7 @@ var render = function() {
                         attrs: {
                           href: "'#'",
                           "data-toggle": "modal",
-                          "data-target": "#ModalEditarCliente" + cliente.edad
+                          "data-target": "#ModalEditarCliente" + cliente.id
                         }
                       },
                       [_vm._v("Editar")]
@@ -38537,7 +38634,7 @@ var render = function() {
                         on: {
                           click: function($event) {
                             $event.preventDefault()
-                            return _vm.borrarCliente($event)
+                            return _vm.borrarCliente(cliente.id)
                           }
                         }
                       },
@@ -50765,16 +50862,11 @@ var app = new Vue({
   el: '#app',
   data: function data() {
     return {
-      elementVisible: true,
+      //elementVisible: true,
       datosCliente: []
     };
   },
-  created: function created() {
-    var _this = this;
-
-    setTimeout(function () {
-      return _this.elementVisible = false;
-    }, 3000);
+  created: function created() {//setTimeout(() => this.elementVisible = false, 3000)
   },
   methods: {}
 });

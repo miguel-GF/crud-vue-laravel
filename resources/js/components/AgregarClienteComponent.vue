@@ -1,6 +1,6 @@
 <template>
 <div>
-<form action="./api/cliente" @click="checkFormAgregarCl" method="POST" @submit="agregarCliente">
+<form method="POST" @submit.prevent="agregarCliente">
     <div class="container-fluid">
         <div class="modal fade modal-open" id="ModalAgregarCliente" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -30,7 +30,7 @@
                         <div class="col-md-6">
                             <span>Edad</span>
                             <input v-model="edad"
-                                class="form-control rounded-0" type="text"  name="edad">
+                                class="form-control rounded-0" type="number"  name="edad" min="0">
                         </div>
                     </div>
                     <br>
@@ -46,10 +46,9 @@
                     <div class="row">
                         <div class="col">
                             <label >Categoría</label>
-                            <select v-model="categoria"
+                            <select v-model="categoria" placeholder="hello mike"
                                 class="form-control rounded-0" name="categoria">
                                 <option selected disabled>Selecciona una categoría</option>
-
                                 <option v-for="c in categorias" :value="c.cliente_categoria_id">
                                     {{ c.nombre }}
                                 </option>
@@ -96,7 +95,7 @@
             listarCategorias() {
 
                 //return this.categorias;
-                axios.get('./api/categoria')
+                axios.get('./api/listarCategorias')
                  .then(response => this.categorias = response.data)
                     .catch(error => {
                         console.log(error.message + ' get: api/categoria');
@@ -107,8 +106,11 @@
             },
 
             agregarCliente() {
-                axios.post('./api/cliente', {
-                        nombre: this.name,
+                if(!this.checkFormAgregarCl())
+                    return false;
+
+                axios.post('./api/agregarCliente', {
+                        nombre: this.nombre,
                         edad: this.edad,
                         email: this.email,
                         categoria: this.categoria,
@@ -120,10 +122,7 @@
 
             },
 
-            checkFormAgregarCl: function (e) {
-                /*if (this.nombre && this.edad && this.email && this.categoria){
-                    return true;
-                }*/
+            checkFormAgregarCl: function () {
 
                 this.errors = [];
 
@@ -144,9 +143,8 @@
                 if (!this.errors.length) {
                     return true;
                 }
-
-                e.preventDefault();
             },
+
             validEmail: function (email) {
                 var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 return re.test(email);

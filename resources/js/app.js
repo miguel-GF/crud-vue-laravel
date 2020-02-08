@@ -14,13 +14,14 @@ const app = new Vue({
     el: '#app',
     data() {
         return {
-            elementVisible: true,
+            //elementVisible: true,
             datosCliente: []
         }
     },
 
    created() {
-       setTimeout(() => this.elementVisible = false, 3000)
+       //setTimeout(() => this.elementVisible = false, 3000)
+
     },
 
     methods: {

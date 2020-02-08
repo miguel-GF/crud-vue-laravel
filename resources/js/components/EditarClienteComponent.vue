@@ -1,8 +1,8 @@
 <template>
     <div>
-
+        <form method="POST" @submit.prevent="editarCliente">
         <div class="container-fluid">
-            <div class="modal fade modal-open" :id="'ModalEditarCliente'+datosClientes.edad" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal fade modal-open" :id="'ModalEditarCliente'+datosClientes.id" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content rounded-0 p-lg-3">
                         <div class="modal-header border-0 tituloModalCliente">
@@ -12,35 +12,35 @@
                             </button>
                         </div>
 
-
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col">
                                     <span>Nombre</span>
-                                    <input v-model="datosClientes.nombre_cliente"
-                                        class="form-control rounded-0" name="nombre" type="text" required>
+                                    <input v-model:nombre="datosClientes.nombre_cliente"
+                                        class="form-control rounded-0"  type="text" required>
                                 </div>
                             </div>
                             <br>
                             <div class="row">
                                 <div class="col-md-6">
                                     <span>Correo electrónico</span>
-                                    <input v-model="datosClientes.email"
-                                           class="form-control rounded-0" type="email" name="email" required>
+                                    <input v-model:email="datosClientes.email"
+                                           class="form-control rounded-0" type="email" required>
                                 </div>
                                 <div class="col-md-6">
                                     <span>Edad</span>
-                                    <input v-model="datosClientes.edad"
-                                        class="form-control rounded-0" type="text"  name="edad" required>
+                                    <input v-model:edad="datosClientes.edad"
+                                        class="form-control rounded-0" type="number" min="0" required>
                                 </div>
                             </div>
                             <br>
                             <div class="row">
                                 <div class="col">
                                     <span>Descripción</span>
-                                    <textarea v-model="datosClientes.descripcion"
-                                        class="form-control rounded-0" type="text" name="descripcion">
-                            </textarea>
+                                    <textarea v-model:descripcion="datosClientes.descripcion"
+                                        class="form-control rounded-0" type="text">
+                                    </textarea>
+                                    <input v-show="" type="text" v-model:idCliente="datosClientes.id">
                                 </div>
                             </div>
                             <br>
@@ -65,13 +65,13 @@
 
                         </div>
                         <div class="modal-footer border-0">
-                            <button type="button" class="btn btn-secondary btn btn-success" >Guardar</button>
+                            <button class="btn btn-secondary btn btn-success" >Guardar</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
+        </form>
     </div>
 </template>
 
@@ -79,7 +79,14 @@
     export default {
         data() {
             return {
-                categorias: []
+                categorias: [],
+                errors: [],
+                edad: '',
+                email: '',
+                categoria: '',
+                descripcion: '',
+                nombre: '',
+                idCliente: ''
             }
         },
 
@@ -87,24 +94,71 @@
             'datosClientes'
         ],
 
+        created() {
+            console.log('componente creado edicion cliente');
+            console.log(this.listarCategorias())
+
+        },
+
         methods: {
             listarCategorias() {
-
                 //return this.categorias;
-                axios.get('./api/categoria')
+                axios.get('./api/listarCategorias')
                     .then(response => this.categorias = response.data)
                     .catch(error => {
-                        console.log(error.message + ' editar-get: api/categoria');
+                        console.log(error.message + ' componenteeditar-get: api/categoria');
                     })
                     .finally(
                         console.log(this.categorias)
                     );
             },
-        },
 
-        created() {
-            console.log('componente creado edicion cliente');
-            console.log(this.listarCategorias())
-        },
+            editarCliente() {
+
+                if(!this.checkFormEditarCl())
+                    return false;
+
+                axios.post('./api/editarCliente', {
+                    nombre: this.datosClientes.nombre_cliente,
+                    edad: this.datosClientes.edad,
+                    email: this.datosClientes.email,
+                    categoria: this.datosClientes.id_categoria,
+                    descripcion: this.datosClientes.descripcion,
+                    idCliente: this.datosClientes.id
+                })
+                .catch(function (error) {
+                    console.log(error)
+                });
+            },
+
+            checkFormEditarCl: function () {
+
+                this.errors = [];
+
+                if (!this.nombre) {
+                    this.errors.push('El Nombre es obligatorio.');
+                }
+                if (!this.edad) {
+                    this.errors.push('La Edad es obligatoria.');
+                }
+                if (!this.email) {
+                    this.errors.push('El Correo Electrónico es obligatorio.');
+                } else if (!this.validEmail(this.email)) {
+                    this.errors.push('El Correo Electrónico debe ser válido.');
+                }
+                if (!this.categoria) {
+                    this.errors.push('La Categoria es obligatorio.');
+                }
+                if (!this.errors.length) {
+                    return true;
+                }
+            },
+
+            validEmail: function (email) {
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(email);
+            }
+
+        }
     }
 </script>

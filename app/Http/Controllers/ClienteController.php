@@ -9,8 +9,9 @@ use PHPUnit\Exception;
 
 class ClienteController extends Controller
 {
-    /**
-     * @return array
+    /** Lista todos los clientes que deben mostrarse
+     * en el Home, en la Tabla
+     * @return array|\Exception|Exception
      */
     public function index()
     {
@@ -29,7 +30,8 @@ class ClienteController extends Controller
 
 
     /**
-     * Store a newly created resource in storage.
+     * Llama la funcion guardarCliente para guardar al cliente
+     * y retornar un mensaje
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -38,7 +40,7 @@ class ClienteController extends Controller
     {
         try {
             ClienteRepos::guardarCliente($request);
-            return redirect('/home')->with('status', 'Información del Cliente Guardada Correctamente.');
+            return 'Información del Cliente Guardada Correctamente';
         }
         catch (Exception $error) {
             $error -> getMessage();
@@ -59,36 +61,39 @@ class ClienteController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Llama la funcion editaCliente para actualizar al cliente
+     * y retornar un mensaje
+     * @param Request $request
+     * @return \Exception|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|Exception
      */
-    public function edit($id)
+    public function update(Request $request)
     {
-        //
+        try {
+            ClienteRepos::editaCliente($request);
+            return 'Información del Cliente Actualizada Correctamente.';
+        }
+        catch (Exception $error) {
+            $error -> getMessage();
+            return $error;
+        }
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Llama a la funcion borraCliente para
+     * actualizar su status
+     * a 300
+     * @param Request $request
+     * @return \Exception|Exception|string
      */
-    public function update(Request $request, $id)
+    public function destroy(Request $request)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        try {
+            ClienteRepos::borraCliente($request);
+            return 'Cliente Eliminado';
+        }
+        catch (Exception $error) {
+            $error -> getMessage();
+            return $error;
+        }
     }
 }
