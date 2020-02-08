@@ -1,6 +1,6 @@
 <template>
     <div>
-        <form method="POST" @submit.prevent="editarCliente">
+        <form @submit.prevent="editarCliente" method="POST">
         <div class="container-fluid">
             <div class="modal fade modal-open" :id="'ModalEditarCliente'+datosClientes.id" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
@@ -115,8 +115,7 @@
 
             editarCliente() {
 
-                if(!this.checkFormEditarCl())
-                    return false;
+                
 
                 axios.post('./api/editarCliente', {
                     nombre: this.datosClientes.nombre_cliente,
@@ -131,33 +130,6 @@
                 });
             },
 
-            checkFormEditarCl: function () {
-
-                this.errors = [];
-
-                if (!this.nombre) {
-                    this.errors.push('El Nombre es obligatorio.');
-                }
-                if (!this.edad) {
-                    this.errors.push('La Edad es obligatoria.');
-                }
-                if (!this.email) {
-                    this.errors.push('El Correo Electrónico es obligatorio.');
-                } else if (!this.validEmail(this.email)) {
-                    this.errors.push('El Correo Electrónico debe ser válido.');
-                }
-                if (!this.categoria) {
-                    this.errors.push('La Categoria es obligatorio.');
-                }
-                if (!this.errors.length) {
-                    return true;
-                }
-            },
-
-            validEmail: function (email) {
-                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return re.test(email);
-            }
 
         }
     }

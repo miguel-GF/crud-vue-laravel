@@ -2228,7 +2228,6 @@ __webpack_require__.r(__webpack_exports__);
       })["finally"](console.log(this.categorias));
     },
     editarCliente: function editarCliente() {
-      if (!this.checkFormEditarCl()) return false;
       axios.post('./api/editarCliente', {
         nombre: this.datosClientes.nombre_cliente,
         edad: this.datosClientes.edad,
@@ -2239,35 +2238,6 @@ __webpack_require__.r(__webpack_exports__);
       })["catch"](function (error) {
         console.log(error);
       });
-    },
-    checkFormEditarCl: function checkFormEditarCl() {
-      this.errors = [];
-
-      if (!this.nombre) {
-        this.errors.push('El Nombre es obligatorio.');
-      }
-
-      if (!this.edad) {
-        this.errors.push('La Edad es obligatoria.');
-      }
-
-      if (!this.email) {
-        this.errors.push('El Correo Electrónico es obligatorio.');
-      } else if (!this.validEmail(this.email)) {
-        this.errors.push('El Correo Electrónico debe ser válido.');
-      }
-
-      if (!this.categoria) {
-        this.errors.push('La Categoria es obligatorio.');
-      }
-
-      if (!this.errors.length) {
-        return true;
-      }
-    },
-    validEmail: function validEmail(email) {
-      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return re.test(email);
     }
   }
 });
@@ -51270,7 +51240,7 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/developer/Escritorio/proyecto/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /home/developer/Escritorio/proyecto-final/resources/js/app.js */"./resources/js/app.js");
 
 
 /***/ })
