@@ -2,12 +2,12 @@
     <div>
         <form @submit.prevent="editarCliente" method="POST">
         <div class="container-fluid">
-            <div class="modal fade modal-open" :id="'ModalEditarCliente'+datosClientes.id" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal fade modal-open" id="ModalEditarCliente" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content rounded-0 p-lg-3">
                         <div class="modal-header border-0 tituloModalCliente">
                             <span>Editar cliente</span>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close"  @click="$emit('cerrar-editar')" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -16,7 +16,7 @@
                             <div class="row">
                                 <div class="col">
                                     <span>Nombre</span>
-                                    <input v-model:nombre="datosClientes.nombre_cliente"
+                                    <input v-model:nombre="cliente.nombre_cliente"
                                         class="form-control rounded-0"  type="text" required>
                                 </div>
                             </div>
@@ -24,12 +24,12 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <span>Correo electrónico</span>
-                                    <input v-model:email="datosClientes.email"
+                                    <input v-model:email="cliente.email"
                                            class="form-control rounded-0" type="email" required>
                                 </div>
                                 <div class="col-md-6">
                                     <span>Edad</span>
-                                    <input v-model:edad="datosClientes.edad"
+                                    <input v-model:edad="cliente.edad"
                                         class="form-control rounded-0" type="number" min="0" required>
                                 </div>
                             </div>
@@ -37,10 +37,10 @@
                             <div class="row">
                                 <div class="col">
                                     <span>Descripción</span>
-                                    <textarea v-model:descripcion="datosClientes.descripcion"
+                                    <textarea v-model:descripcion="cliente.descripcion"
                                         class="form-control rounded-0" type="text">
                                     </textarea>
-                                    <input v-show="" type="text" v-model:idCliente="datosClientes.id">
+                                    <input v-show="" type="text" v-model:idCliente="cliente.id">
                                 </div>
                             </div>
                             <br>
@@ -49,12 +49,12 @@
                                     <label>Categoría</label>
                                     <select class="form-control rounded-0">
                                         <option disabled>Selecciona una categoría</option>
-                                        <option :value="datosClientes.id_categoria" selected >{{datosClientes.categoria}}</option>
+                                        <option v-model:categoria="cliente.id_categoria" selected >{{cliente.categoria}}</option>
 
                                         <option
-                                            :value="c.cliente_categoria_id"
+                                            v-model:categoria="cliente.id_categoria"
                                             v-for="c in categorias"
-                                            v-if="datosClientes.id_categoria!= c.cliente_categoria_id" >
+                                            v-if="cliente.id_categoria!= c.cliente_categoria_id" >
 
                                              {{ c.nombre }}
 
@@ -91,15 +91,19 @@
         },
 
         props: [
-            'datosClientes'
+            'cliente',
+            'mostrarInformacion',
+            'informacion'
         ],
 
         created() {
             console.log('componente creado edicion cliente');
-            console.log(this.listarCategorias())
+            this.listarCategorias()
 
         },
-
+        mounted() {
+            console.log(this.cliente);
+        },
         methods: {
             listarCategorias() {
                 //return this.categorias;
@@ -114,22 +118,31 @@
             },
 
             editarCliente() {
-
-                
-
                 axios.post('./api/editarCliente', {
-                    nombre: this.datosClientes.nombre_cliente,
-                    edad: this.datosClientes.edad,
-                    email: this.datosClientes.email,
-                    categoria: this.datosClientes.id_categoria,
-                    descripcion: this.datosClientes.descripcion,
-                    idCliente: this.datosClientes.id
+                    nombre: this.cliente.nombre_cliente,
+                    edad: this.cliente.edad,
+                    email: this.cliente.email,
+                    categoria: this.cliente.id_categoria,
+                    descripcion: this.cliente.descripcion,
+                    idCliente: this.cliente.id
                 })
                 .catch(function (error) {
                     console.log(error)
-                });
+                })
+                .then(
+                    this.listarCliente(),
+                    this.cambiarInformacion(),
+                    $('#ModalEditarCliente').modal('hide'),
+                );
             },
 
+            listarCliente() {
+                this.$emit('listar-cliente')
+            },
+
+            cambiarInformacion() {
+                this.$emit('cambiar-info')
+            }
 
         }
     }

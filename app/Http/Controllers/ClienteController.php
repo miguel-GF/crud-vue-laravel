@@ -15,7 +15,7 @@ class ClienteController extends Controller
      */
     public function index()
     {
-       // return Cliente::all();
+       // $busqueda = '';
         try {
             $clientes = ClienteRepos::listarClientes();
             $array = collect($clientes)->toArray();
@@ -28,7 +28,6 @@ class ClienteController extends Controller
 
     }
 
-
     /**
      * Llama la funcion guardarCliente para guardar al cliente
      * y retornar un mensaje
@@ -39,8 +38,10 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         try {
-            ClienteRepos::guardarCliente($request);
-            return 'Información del Cliente Guardada Correctamente';
+            if (ClienteRepos::guardarCliente($request)==true)
+                return (string) true;
+            else
+                return (string) false;
         }
         catch (Exception $error) {
             $error -> getMessage();
@@ -50,14 +51,22 @@ class ClienteController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Exception|Exception
      */
-    public function show($id)
-    {
-        //
+    public static function busquedaClientes(Request $request) {
+        try {
+            $busqueda = $request->get('busqueda') ?: '';
+            //$busqueda = $request->get('busqueda');
+            $query = ClienteRepos::buscaClientes($busqueda);
+            $resultado = collect($query)->toArray();
+            return $resultado;
+
+        }
+        catch (Exception $error) {
+            $error -> getMessage();
+            return $error;
+        }
     }
 
     /**

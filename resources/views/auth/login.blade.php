@@ -10,7 +10,7 @@
                 <div class="card-body">
                 <div class="row" >
                     <div class="col" align="center">
-                        <img src="storage/logotipo.png"  width="125" height="100">
+                        <img :src="'storage/'+imagen"  width="125" height="100">
                         <br>
                         <span class="welcome">¡Bienvenido!</span>
                     </div>

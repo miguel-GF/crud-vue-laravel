@@ -1,13 +1,14 @@
 <template>
 <div>
+
 <form method="POST" @submit.prevent="agregarCliente">
     <div class="container-fluid">
-        <div class="modal fade modal-open" id="ModalAgregarCliente" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal fade modal-open" id="ModalAgregar" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="false">
+            <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content rounded-0 p-lg-3">
                 <div class="modal-header border-0 tituloModalCliente">
                     <span>Agregar nuevo cliente</span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" @click="$emit('cerrar-agregar')" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -57,12 +58,6 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0">
-                    <p v-if="errors.length">
-                        <b>Por favor, corrija el(los) siguiente(s) error(es):</b>
-                        <ul>
-                            <li v-for="error in errors">{{ error }}</li>
-                        </ul>
-                    </p>
                     <button type="submit" class="btn btn-secondary btn btn-success" >Guardar</button>
                 </div>
             </div>
@@ -91,6 +86,7 @@
             console.log('componente creado');
             console.log(this.listarCategorias())
         },
+
         methods: {
             listarCategorias() {
 
@@ -116,10 +112,19 @@
                         categoria: this.categoria,
                         descripcion: this.descripcion,
                 })
+
                 .catch(function (error) {
                     console.log(error)
-                });
+                })
+                .then(
+                    $('#ModalAgregar').modal('hide'),
+                    this.listarCliente()
+                );
 
+            },
+
+            listarCliente() {
+                this.$emit('listar-cliente')
             },
 
             checkFormAgregarCl: function () {
